@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from base.models import Product, Order, OrderItem, ShippingAddress
 from base.serializers import ProductSerializer, OrderSerializer
 from datetime import datetime
+from django.utils import timezone
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -89,9 +90,20 @@ def getOrderById(request, pk):
 def updateOrderToPaid(request, pk):
     order = Order.objects.get(_id=pk)
     order.isPaid = True
-    order.paidAt = datetime.now()
+    order.paidAt = timezone.now()
     order.save()
     return Response("Order was paid")
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def updateOrderToDelivered(request, pk):
+    order = Order.objects.get(_id=pk)
+    order.isDelivered = True
+    order.deliveredAt = timezone.now()
+    order.save()
+    return Response("Order was marked as delivered.")
+
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
